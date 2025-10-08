@@ -1,11 +1,15 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import Redis from 'ioredis';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject('REDIS_CLIENT') private readonly redis: Redis,
+  ) {}
 
   async registerUser(
     email: string,
