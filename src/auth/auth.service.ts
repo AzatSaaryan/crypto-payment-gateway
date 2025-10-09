@@ -1,15 +1,11 @@
-import { ConflictException, Injectable, Inject } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import Redis from 'ioredis';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject('REDIS_CLIENT') private readonly redis: Redis,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async registerUser(
     email: string,
@@ -29,6 +25,8 @@ export class AuthService {
         data: { email, passwordHash },
         select: { id: true, email: true, createdAt: true, updatedAt: true },
       });
+
+      // const payload = { sub: newUser.id, email: newUser.email };
 
       return newUser;
     } catch (error) {
