@@ -1,6 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-// import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { AppJwtService } from '../jwt/jwt.service';
 
@@ -38,6 +41,34 @@ export class AuthService {
       return { token: accessToken };
     } catch (error) {
       console.error('Error registering user:', error);
+      throw error;
+    }
+  }
+
+  async loginUser(
+    email: string,
+    password: string,
+  ): Promise<{ accessToken: string }> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user)
+        throw new ConflictException("User doesn't exist. Please register");
+
+      const isMatch = await bcrypt.compare(password, user.passwordHash);
+
+      if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+
+      const payload = { sub: user.id, email: user.email };
+
+      const accessToken = await this.jwt.signAccessToken(payload);
+      await this.jwt.signRefreshToken(payload);
+
+      return { accessToken };
+    } catch (error) {
+      console.error('User login error:', error);
       throw error;
     }
   }
