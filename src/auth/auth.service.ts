@@ -17,6 +17,7 @@ export class AuthService {
   async registerUser(
     email: string,
     password: string,
+    username: string,
   ): Promise<{ token: string }> {
     try {
       const existingUser = await this.prisma.user.findUnique({
@@ -29,8 +30,7 @@ export class AuthService {
       const passwordHash = await bcrypt.hash(password, salt);
 
       const newUser = await this.prisma.user.create({
-        data: { email, passwordHash },
-        select: { id: true, email: true, createdAt: true, updatedAt: true },
+        data: { email, passwordHash, username },
       });
 
       const payload = { sub: newUser.id, email: newUser.email };

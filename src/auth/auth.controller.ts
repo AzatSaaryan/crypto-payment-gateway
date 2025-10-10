@@ -9,7 +9,11 @@ export class AuthController {
 
   @Post('register')
   async register(@Body(new ValidationPipe()) userData: CreateUserDto) {
-    return this.authService.registerUser(userData.email, userData.password);
+    return this.authService.registerUser(
+      userData.email,
+      userData.password,
+      userData.username,
+    );
   }
 
   @Post('login')
