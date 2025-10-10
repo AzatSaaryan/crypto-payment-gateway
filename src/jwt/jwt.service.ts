@@ -20,7 +20,7 @@ export class AppJwtService {
     return accessToken;
   }
 
-  async signRefreshToken(payload: JwtPayload): Promise<void> {
+  async signRefreshToken(payload: JwtPayload): Promise<string> {
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: jwtConstants.refreshSecret,
       expiresIn: jwtConstants.refreshTtl,
@@ -32,6 +32,8 @@ export class AppJwtService {
       'EX',
       60 * 60 * 24 * 7,
     );
+
+    return refreshToken;
   }
 
   async verifyAccessToken(token: string): Promise<JwtPayload> {

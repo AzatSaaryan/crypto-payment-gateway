@@ -8,6 +8,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { RefreshDto } from './dto/refresh.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,5 +31,10 @@ export class AuthController {
   @Post('logout')
   async logout(@Headers('authorization') authHeader: string) {
     return this.authService.logoutUser(authHeader);
+  }
+
+  @Post('refresh')
+  async refresh(@Body() dto: RefreshDto) {
+    return this.authService.refreshTokens(dto.refreshToken);
   }
 }
