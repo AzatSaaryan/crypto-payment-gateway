@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -69,6 +70,29 @@ export class AuthService {
       return { accessToken };
     } catch (error) {
       console.error('User login error:', error);
+      throw error;
+    }
+  }
+
+  async logoutUser(authHeader: string): Promise<{ message: string }> {
+    if (!authHeader)
+      throw new UnauthorizedException('Authorization header is missing');
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+      const payload = await this.jwt.verifyAccessToken(token);
+      const userId = payload.sub;
+      const deleted = await this.jwt.deleteRefreshToken(userId);
+
+      if (!deleted)
+        throw new BadRequestException(
+          'Refresh token not found or already invalidated',
+        );
+
+      return { message: 'Logged out successfully' };
+    } catch (error) {
+      console.error('User logout error', error);
       throw error;
     }
   }

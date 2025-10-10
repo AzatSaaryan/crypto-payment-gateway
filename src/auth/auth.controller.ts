@@ -1,4 +1,10 @@
-import { Controller, Post, Body, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  ValidationPipe,
+  Headers,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -19,5 +25,10 @@ export class AuthController {
   @Post('login')
   async login(@Body(new ValidationPipe()) userData: LoginUserDto) {
     return this.authService.loginUser(userData.email, userData.password);
+  }
+
+  @Post('logout')
+  async logout(@Headers('authorization') authHeader: string) {
+    return this.authService.logoutUser(authHeader);
   }
 }

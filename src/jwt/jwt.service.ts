@@ -45,4 +45,9 @@ export class AppJwtService {
       secret: jwtConstants.refreshSecret,
     });
   }
+
+  async deleteRefreshToken(userId: string): Promise<boolean> {
+    const deleted = await this.redis.del(`refresh:${userId}`);
+    return deleted === 1;
+  }
 }
