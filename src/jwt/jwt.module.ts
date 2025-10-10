@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
-import { JwtService } from './jwt.service';
+import { AppJwtService } from './jwt.service';
+import { JwtModule } from '@nestjs/jwt';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
+  imports: [JwtModule.register({}), RedisModule],
   controllers: [],
-  providers: [JwtService],
+  providers: [AppJwtService],
+  exports: [AppJwtService],
 })
-export class JwtModule {}
+export class AppJwtModule {}
