@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ethers } from 'ethers';
-// import { encryptUtf8, decryptUtf8 } from './deposits.utils';
+import { ethers, Wallet } from 'ethers';
+import { encryptUtf8, decryptUtf8 } from './deposits.utils';
 // import ERC20_ABI from '../abi/erc20.json';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -11,8 +11,22 @@ export class DepositsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  createDeposit(userId: string): string {
-    console.log(userId);
-    return userId;
+  async createDeposit(userId: string): Promise<{ walletAddress: string }> {
+    try {
+      const wallet = Wallet.createRandom();
+      const walletAddress = wallet.address;
+      const privateKey = wallet.privateKey;
+
+      const encryptedPK = encryptUtf8(privateKey);
+
+      await this.prisma.deposit.create({
+        data: { userId, walletAddress, encryptedPK },
+      });
+
+      return { walletAddress };
+    } catch (error) {
+      console.error('Error creating deposit address');
+      throw error;
+    }
   }
 }
